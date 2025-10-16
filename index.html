@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake and Ladder Game</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            width: 500px;
+            height: 500px;
+            border: 1px solid black;
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid black;
+        }
+
+        .player1 {
+            background-color: red;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+        }
+
+        .player2 {
+            background-color: blue;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="board"></div>
+    <button onclick="rollDice()">Roll Dice</button>
+    <div id="diceValue"></div>
+    <button onclick="reset()">Reset</button>
+
+    <script>
+        let currentPlayer = 1;
+        let player1Position = 0;
+        let player2Position = 0;
+
+        const snakesAndLadders = {3: 20, 15: 5, 17: 7, 19: 21, 24: 1, 32: 10, 36: 8, 42: 22, 45: 14, 50: 25, 54: 33, 62: 18, 64: 60, 74: 44, 78: 64, 85: 32, 89: 53, 99: 41};
+
+        function rollDice() {
+            const diceValue = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('diceValue').innerText = `Dice: ${diceValue}`;
+
+            movePlayer(diceValue);
+        }
+
+        function movePlayer(steps) {
+            const currentPosition = currentPlayer === 1 ? player1Position : player2Position;
+            let newPosition = currentPosition + steps;
+
+            if (newPosition > 100) {
+                newPosition = 100 - (newPosition - 100);
+            }
+
+            if (snakesAndLadders[newPosition]) {
+                newPosition = snakesAndLadders[newPosition];
+            }
+
+            if (currentPlayer === 1) {
+                player1Position = newPosition;
+            } else {
+                player2Position = newPosition;
+            }
+
+            updatePlayersUI();
+            checkWinner();
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+        }
+
+        function updatePlayersUI() {
+            const player1Cell = document.querySelector(`.cell[data-index="${player1Position}"]`);
+            const player2Cell = document.querySelector(`.cell[data-index="${player2Position}"]`);
+
+            document.querySelectorAll('.player1').forEach(player => player.classList.remove('player1'));
+            document.querySelectorAll('.player2').forEach(player => player.classList.remove('player2'));
+
+            if (player1Cell) {
+                player1Cell.querySelector('.player1').classList.add('player1');
+            }
+
+            if (player2Cell) {
+                player2Cell.querySelector('.player2').classList.add('player2');
+            }
+        }
+
+        function checkWinner() {
+            if (player1Position === 100) {
+                alert('Player 1 wins!');
+            } else if (player2Position === 100) {
+                alert('Player 2 wins!');
+            }
+        }
+
+        function reset() {
+            player1Position = 0;
+            player2Position = 0;
+            currentPlayer = 1;
+
+            updatePlayersUI();
+        }
+
+        const board = document.querySelector('.board');
+
+        for (let i = 100; i >= 1; i--) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('data-index', i);
+            cell.innerText = i;
+            board.appendChild(cell);
+        }
+
+        updatePlayersUI();
+    </script>
+</body>
+</html>
